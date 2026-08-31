@@ -1,5 +1,5 @@
 ### EX5 Information Retrieval Using Boolean Model in Python
-### DATE: 
+### DATE: 31/08/2026
 ### AIM: To implement Information Retrieval Using Boolean Model in Python.
 ### Description:
 <div align = "justify">
@@ -22,72 +22,116 @@ The Boolean model in Information Retrieval (IR) is a fundamental model used for 
     <p>c) For each term in the query, it retrieves documents containing that term and performs Boolean operations (AND, OR, NOT) based on the query's structure.
 
 ### Program:
+```
+import numpy as np
+```
+import pandas as pd
 
-    import numpy as np
-    import pandas as pd
-    class BooleanRetrieval:
-        def __init__(self):
-            self.index = {}
-            self.documents_matrix = None
+class BooleanRetrieval: def init(self): self.index = {} self.documents_matrix = None
 
-    def index_document(self, doc_id, text):
-        terms = text.lower().split()
-        print("Document -", doc_id, terms)
+````
+def index_document(self, doc_id, text):
+    terms = text.lower().split()
+    print("Document -", doc_id, terms)
 
-        for term in terms:
-            if term not in self.index:
-                self.index[term] = set()
-            self.index[term].add(doc_id)
+    for term in terms:
+        if term not in self.index:
+            self.index[term] = set()
+        self.index[term].add(doc_id)
 
-    def create_documents_matrix(self, documents):
-        terms = list(self.index.keys())
-        num_docs = len(documents)
-        num_terms = len(terms)
+def create_documents_matrix(self, documents):
+    terms = list(self.index.keys())
+    num_docs = len(documents)
+    num_terms = len(terms)
 
-        self.documents_matrix = np.zeros((num_docs, num_terms), dtype=int)
+    self.documents_matrix = np.zeros((num_docs, num_terms), dtype=int)
 
-        for i, (doc_id, text) in enumerate(documents.items()):
-            doc_terms = text.lower().split()
-            for term in doc_terms:
-                if term in self.index:
-                    term_id = terms.index(term)
-                    self.documents_matrix[i, term_id] = 1
+    for i, (doc_id, text) in enumerate(documents.items()):
+        doc_terms = text.lower().split()
+        for term in doc_terms:
+            if term in self.index:
+                term_id = terms.index(term)
+                self.documents_matrix[i, term_id] = 1
 
-    def print_documents_matrix_table(self):
-        df = pd.DataFrame(self.documents_matrix, columns=self.index.keys())
-        print(df)
+def print_documents_matrix_table(self):
+    df = pd.DataFrame(self.documents_matrix, columns=self.index.keys())
+    print(df)
 
-    def print_all_terms(self):
-        print("All terms in the documents:")
-        print(list(self.index.keys()))
+def print_all_terms(self):
+    print("All terms in the documents:")
+    print(list(self.index.keys()))
 
-    def boolean_search(self, query):
-        # TYPE YOUR CODE HERE
+def boolean_search(self, query):
+    query_terms = query.lower().split()
+    results = set()  # Initialize as empty set to accumulate results
+    current_set = None  # Current set to handle 'or' logic
 
-if __name__ == "__main__":
-    indexer = BooleanRetrieval()
+    i = 0
+    while i < len(query_terms):
+        term = query_terms[i]
 
-    documents = {
-        1: "Python is a programming language",
-        2: "Information retrieval deals with finding information",
-        3: "Boolean models are used in information retrieval"
-    }
+        if term == 'or':
+            if current_set is not None:
+                results.update(current_set)
+            current_set = None  # Reset current set for the next term
+        elif term == 'and':
+            i += 1
+            continue  # 'and' is implicit, move to next term
+        elif term == 'not':
+            i += 1
+            if i < len(query_terms):
+                not_term = query_terms[i]
+                if not_term in self.index:
+                    not_docs = self.index[not_term]
+                    if current_set is None:
+                        current_set = set(range(1, len(documents) + 1))  # All doc IDs
+                    current_set.difference_update(not_docs)
+        else:
+            if term in self.index:
+                term_docs = self.index[term]
+                if current_set is None:
+                    current_set = term_docs.copy()
+                else:
+                    current_set.intersection_update(term_docs)
+            else:
+                current_set = set()  # If the term doesn't exist, it results in an empty set
 
-    for doc_id, text in documents.items():
-        indexer.index_document(doc_id, text)
+        i += 1
 
-    indexer.create_documents_matrix(documents)
-    indexer.print_documents_matrix_table()
-    indexer.print_all_terms()
+    # Update results with the last processed set
+    if current_set is not None:
+        results.update(current_set)
 
-    query = input("Enter your boolean query: ")
-    results = indexer.boolean_search(query)
-    if results:
-        print(f"Results for '{query}': {results}")
-    else:
-        print("No results found for the query.")
+    return sorted(results)
+````
+## Example usage
+if name == "main": indexer = BooleanRetrieval()
 
+````
+documents = {
+    1: "Python is a programming language",
+    2: "Information retrieval deals with finding information",
+    3: "Boolean models are used in information retrieval"
+}
 
-### Output:
+for doc_id, text in documents.items():
+    indexer.index_document(doc_id, text)
+
+indexer.create_documents_matrix(documents)
+indexer.print_documents_matrix_table()
+indexer.print_all_terms()
+
+query = input("Enter your boolean query: ")
+results = indexer.boolean_search(query)
+if results:
+    print(f"Results for '{query}': {results}")
+else:
+    print("No results found for the query.")
+````
+
+## OUTPUT
+<img width="1198" height="333" alt="image" src="https://github.com/user-attachments/assets/f06226e3-4df0-4ae8-a1ac-7f22a494a1dc" />
+
 
 ### Result:
+Thus the information Retrival using Boolean Model in Python is successfully executed.
